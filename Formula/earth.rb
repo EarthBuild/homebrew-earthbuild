@@ -1,4 +1,4 @@
-class Earthbuild < Formula
+class Earth < Formula
   desc "Build automation tool for the container era"
   homepage "https://github.com/earthbuild"
   url "https://github.com/earthbuild/earthbuild.git",
@@ -23,9 +23,11 @@ class Earthbuild < Formula
       -X main.BuiltBy=homebrew-earthbuild
     ]
     tags = "dfrunmount dfrunsecurity dfsecrets dfssh dfrunnetwork dfheredoc forceposix"
-    system "go", "build", "-tags", tags, *std_go_args(ldflags: ldflags, output: bin/"earthly"), "./cmd/earthly"
+    system "go", "build", "-tags", tags, *std_go_args(ldflags: ldflags, output: bin/"earth"), "./cmd/earth"
 
-    generate_completions_from_executable(bin/"earthly", "bootstrap", "--source", shells: [:bash, :zsh])
+    bin.install_symlink "earth" => "earthly"
+
+    generate_completions_from_executable(bin/"earth", "bootstrap", "--source", shells: [:bash, :zsh])
   end
 
   test do
