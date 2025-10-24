@@ -17,7 +17,7 @@ class Earth < Formula
     ENV["CGO_ENABLED"] = "0"
     ldflags = %W[
       -s -w
-      -X main.DefaultBuildkitdImage=docker.io/earthbuild/buildkitd:v#{version}
+      -X main.DefaultBuildkitdImage=docker.io/earthly/buildkitd:v0.8.16
       -X main.Version=v#{version}
       -X main.GitSha=#{Utils.git_head}
       -X main.BuiltBy=homebrew-earthbuild
