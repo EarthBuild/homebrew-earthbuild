@@ -1,19 +1,24 @@
-# homebrew-earthly
+# homebrew-earthbuild
 
-This repository contains the homebrew formula required to install `earthly` on MacOS via `brew`.
+This repository contains the homebrew formula required to install `earthbuild` on MacOS via `brew`.
 
-To install earthly on MacOS, run:
+## Installation
+
+**Only alpha version is available at the moment. Stable version coming soon.**
+
+To install a stable version of `earthbuild` on macOS, run:
 
 ```
-brew install earthly/earthly/earthly && earthly bootstrap
+brew install earthbuild/earthbuild/earthbuild
 ```
 
-As described on the [get earthly](https://earthly.dev/get-earthly) page.
+Alternatively, you can install the alpha version of `earthbuild` on macOS, which contains
+the latest (potentially unstable) changes, run:
+
+```
+brew install --HEAD earthbuild/earthbuild/earthbuild
+```
 
 ## FAQ
 
-### What's the difference between homebrew-core and earthly/earthly/earthly
-
-If you run `brew install earthly`, you will install the version from [homebrew-core](https://github.com/homebrew/homebrew-core), which is controlled by the homebrew community.
-
-Instead, it's recommended to install earthly from the earthly tap, which is maintained by earthly, and is part of the official earthly release process. This means near-zero delay between propigating a [binary release](https://github.com/earthly/earthly/releases) to the tap. Releases to the homebrew-core tap, on the otherhand, must be approved by the homebrew-core maintainers which introduces delay.
+N/A
