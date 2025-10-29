@@ -5,7 +5,7 @@ class Earth < Formula
     tag: "v0.8.17",
       revision: "52f2da6dd7f3de24a60a76e00044ec560b0ea407"
   license "MPL-2.0"
-  head "https://github.com/earthbuild/earthbuild.git", branch: "main"
+  head "https://github.com/EarthBuild/earthbuild.git", branch: "main"
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_tahoe: "194e4b767c3d1a551453ceb3739345c84de89533768b352e3b339d116497a238"
