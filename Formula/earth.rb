@@ -30,7 +30,7 @@ class Earth < Formula
     tags = 'dfrunmount dfrunsecurity dfsecrets dfssh dfrunnetwork dfheredoc forceposix'
     system 'go', 'build', '-tags', tags, *std_go_args(ldflags: ldflags, output: bin / 'earth'), './cmd/earthly'
 
-    bin.install_symlink 'earth' => 'earthly'
+    bin.install_symlink 'earthly' => 'earth'
 
     generate_completions_from_executable(bin / 'earth', 'bootstrap', '--source', shells: %i[bash zsh])
   end
