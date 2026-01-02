@@ -3,6 +3,9 @@ name: Release
 on:
   push:
 
+permissions:
+  contents: write
+
 jobs:
   check:
     runs-on: ubuntu-24.04-arm
