@@ -5,7 +5,14 @@ WORKDIR /home/linuxbrew/earthbuild-tap
 RUN brew developer on
 
 src:
-    COPY --dir .git Formula .
+    COPY --dir Formula .
+    RUN \
+        git config --global init.defaultBranch main && \
+        git init && \
+        git config user.email "local@local" && \
+        git config user.name "local" && \
+        git add . && \
+        git commit -m "local snapshot"
     RUN brew tap EarthBuild/tap .
 
 # lint verify the formula for code quality
