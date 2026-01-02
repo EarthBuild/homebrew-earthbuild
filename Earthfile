@@ -13,12 +13,12 @@ lint:
     BUILD +audit
     BUILD +style
 
-# audit the formula
+# audit checks for Homebrew coding style violations
 audit:
     FROM +src
     RUN brew audit --new --signing --debug --audit-debug EarthBuild/tap/earth
 
-# style check the formula
+# style checks for conformance to Homebrew style guidelines
 style:
     FROM +src
     RUN brew style --verbose --debug EarthBuild/tap/earth
