@@ -15,7 +15,7 @@ src:
         git commit -m "local snapshot"
     RUN brew tap EarthBuild/tap .
 
-# lint verify the formula for code quality
+# lint checks for Homebrew code quality
 lint:
     BUILD +audit
     BUILD +style
@@ -29,3 +29,11 @@ audit:
 style:
     FROM +src
     RUN brew style --verbose --debug EarthBuild/tap/earth
+
+test-install-bin:
+    FROM +src
+    RUN brew install --debug EarthBuild/tap/earth
+
+test-install-src:
+    FROM +src
+    RUN brew install --head --build-from-source --debug EarthBuild/tap/earth

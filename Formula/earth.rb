@@ -3,7 +3,8 @@ class Earth < Formula
   homepage "https://github.com/earthbuild"
   url "https://github.com/EarthBuild/earthbuild.git",
       tag:      "v0.8.17-rc-0",
-      revision: "52f2da6dd7f3de24a60a76e00044ec560b0ea407"
+      revision: "0574020c3a62ef0bab81247078cb9c3e66eb51f6"
+
   license "MPL-2.0"
   head "https://github.com/EarthBuild/earthbuild.git", branch: "main"
 
@@ -25,7 +26,7 @@ class Earth < Formula
       -X main.BuiltBy=homebrew-earthbuild
     ]
     tags = "dfrunmount dfrunsecurity dfsecrets dfssh dfrunnetwork dfheredoc forceposix"
-    system "go", "build", "-tags", tags, *std_go_args(ldflags: ldflags, output: bin / "earth"), "./cmd/earthly"
+    system "go", "build", "-tags", tags, "-ldflags", ldflags.join(" "), "-o", "earth", "./cmd/earthly"
 
     bin.install_symlink "earthly" => "earth"
 
