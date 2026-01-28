@@ -1,0 +1,21 @@
+name: Release
+
+on:
+  push:
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04-arm
+    env:
+      FORCE_COLOR: 1
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: earthbuild/actions-setup@main
+
+      - name: Lint
+        run: earthly --ci +lint
