@@ -16,6 +16,8 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: earthbuild/actions-setup@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Bootstrap buildkitd
         run: earth bootstrap
