@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   check:
-    runs-on: macos-26
+    runs-on: ubuntu-24.04-arm
     env:
       FORCE_COLOR: 1
     steps:
