@@ -22,3 +22,6 @@ jobs:
 
       - name: Lint
         run: earth --ci +lint
+
+      - name: Test
+        run: earth --ci +test
