@@ -32,8 +32,11 @@ check:
 # lint checks for Homebrew code quality
 lint:
     BUILD +info
+    BUILD +readall
     BUILD +audit
     BUILD +style
+    BUILD +fetch
+    BUILD +livecheck
 
 # audit checks for Homebrew coding style violations
 audit:
@@ -49,6 +52,16 @@ style:
 info:
     FROM +src
     RUN brew info EarthBuild/tap/earth
+
+# readall checks that all formulae in the tap can be successfully parsed
+readall:
+    FROM +src
+    RUN brew readall EarthBuild/tap
+
+# fetch verifies source URLs and sha256 checksums
+fetch:
+    FROM +src
+    RUN brew fetch --build-from-source EarthBuild/tap/earth
 
 # livecheck checks if there is a newer version available upstream
 livecheck:
