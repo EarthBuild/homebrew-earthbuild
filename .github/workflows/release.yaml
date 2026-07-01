@@ -2,9 +2,16 @@ name: Release
 
 on:
   push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - main
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
   check:
@@ -27,3 +34,29 @@ jobs:
 
       - name: Test
         run: earth --ci +test
+
+  publish:
+    needs: check
+    if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'release-v')
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: earthbuild/actions-setup@main
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+      
+      - name: Build Linux Bottles
+        run: earth --ci +bottle-linux-all
+        
+      - name: Build macOS Bottle
+        run: earth --ci +bottle-mac
+        
+      - name: Publish all Bottles
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          earth --ci \
+            --secret GITHUB_TOKEN=$GITHUB_TOKEN \
+            --build-arg GITHUB_REF=${{ github.head_ref }} \
+            --build-arg GITHUB_SHA=${{ github.event.pull_request.head.sha }} \
+            +publish

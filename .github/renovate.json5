@@ -7,4 +7,23 @@
     ":semanticCommits",
   ],
   labels: ["renovate"],
+  customManagers: [
+    {
+      customType: "regex",
+      fileMatch: ["^Formula/earth\\.rb$"],
+      matchStrings: [
+        "url\\s+\"https://github\\.com/(?<depName>EarthBuild/earthbuild)\\.git\",\\s+tag:\\s+\"v(?<currentValue>.*?)\",\\s+revision:\\s+\"(?<currentDigest>.*?)\"",
+        "version\\s+\"(?<currentValue>.*?)\"",
+        "docker\\.io/earthbuild/buildkitd:v(?<currentValue>[0-9.]+)"
+      ],
+      datasourceTemplate: "github-tags",
+      depNameTemplate: "EarthBuild/earthbuild"
+    }
+  ],
+  packageRules: [
+    {
+      matchPackageNames: ["EarthBuild/earthbuild"],
+      branchName: "release-v{{{newVersion}}}"
+    }
+  ],
 }

@@ -9,20 +9,13 @@ RUN useradd -m -s /bin/bash linuxbrew && \
     echo 'linuxbrew ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
     chown -R linuxbrew:linuxbrew /home/linuxbrew
 USER linuxbrew
-RUN \
+RUN git config --global --add safe.directory /home/linuxbrew/earthbuild-tap && \
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" && \
     /home/linuxbrew/.linuxbrew/bin/brew developer on
 
 src:
-    COPY --dir Formula .
-    RUN \
-        git config --global init.defaultBranch main && \
-        git init && \
-        git config user.email "local@local" && \
-        git config user.name "local" && \
-        git add . && \
-        git commit -m "local snapshot"
-    RUN brew tap EarthBuild/tap .
+    COPY --dir .git Formula .
+    RUN brew tap EarthBuild/tap . && brew trust EarthBuild/tap
 
 # check verifies the quality of the formula
 check:
@@ -108,3 +101,41 @@ bottle-linux:
 # bottle-linux-all builds linux bottles for both amd64 and arm64
 bottle-linux-all:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +bottle-linux
+
+# bottle-mac builds a macos bottle natively
+bottle-mac:
+    LOCALLY
+    RUN mkdir -p bottles/
+    RUN brew install --build-bottle EarthBuild/tap/earth
+    RUN brew bottle --no-rebuild --json EarthBuild/tap/earth
+    RUN mv earth--*.bottle.* bottles/
+
+publish:
+    FROM +src
+    ARG GITHUB_REF
+    ARG GITHUB_SHA
+    ARG --required GIT_USER_EMAIL
+    ARG --required GIT_USER_NAME
+
+    # Copy the bottles built by the workflow
+    COPY ./bottles ./bottles
+
+    # Upload bottles to GHCR and update the formula bottle block
+    RUN --secret HOMEBREW_GITHUB_PACKAGES_TOKEN=GITHUB_TOKEN \
+        git config --global user.email "$GIT_USER_EMAIL" && \
+        git config --global user.name "$GIT_USER_NAME" && \
+        cd ./bottles && \
+        brew pr-upload --debug --verbose
+
+    # Merge into main and delete release branch
+    # RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
+    #     set -e && \
+    #     GITHUB_REPOSITORY=$(git remote get-url origin | sed -E 's|.*github.com[:/]([^/]+/[^/.]+)(\.git)?|\1|') && \
+    #     SHA=$(git rev-parse HEAD) && \
+    #     git remote set-url origin https://x-access-token:$GITHUB_TOKEN@github.com/"$GITHUB_REPOSITORY" && \
+    #     git fetch -a && \
+    #     git checkout main && \
+    #     git reset --hard origin/main && \
+    #     git merge "$SHA" && \
+    #     git push origin main && \
+    #     git push origin --delete "$GITHUB_REF"
