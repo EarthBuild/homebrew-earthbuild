@@ -4,7 +4,6 @@ class Earth < Formula
   url "https://github.com/EarthBuild/earthbuild.git",
       tag:      "v0.8.17",
       revision: "6babd00c58685413912e5e92bd22bb5c7ee993e8"
-  version "0.8.17"
   license "MPL-2.0"
   head "https://github.com/EarthBuild/earthbuild.git", branch: "main"
 
