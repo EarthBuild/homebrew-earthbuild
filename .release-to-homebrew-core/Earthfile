@@ -1,5 +1,4 @@
-VERSION 0.7
-PROJECT earthbuild/homebrew
+VERSION 0.8
 
 deps:
     FROM homebrew/brew:4.0.17 # ubuntu-based
