@@ -33,7 +33,7 @@ class Earth < Formula
       Hardware::CPU.arm? ? "earth-linux-arm64" : "earth-linux-amd64"
     end
 
-    system "chmod", "+x", binary_name
+    chmod 0755, binary_name
     bin.install binary_name => "earth"
     bin.install_symlink "earth" => "earthly"
 
