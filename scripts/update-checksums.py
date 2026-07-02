@@ -46,7 +46,7 @@ def main():
 
     # 4. Update sha256 hashes in earth.rb
     for b in required_binaries:
-        pattern = rf'(url\s+"https://github\.com/EarthBuild/earthbuild/releases/download/v#{{version}}/{b}"\s+sha256\s+")[a-f0-9]+(")'
+        pattern = r'(url\s+"https://github\.com/EarthBuild/earthbuild/releases/download/v#\{version\}/%s"\s+sha256\s+")[a-f0-9]+(")' % b
         content, count = re.subn(pattern, rf'\g<1>{hashes[b]}\g<2>', content)
         if count == 0:
             print(f"Error: failed to replace sha256 for {b} in Formula/earth.rb")
