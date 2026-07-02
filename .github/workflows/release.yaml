@@ -5,11 +5,12 @@ on:
     branches:
       - main
 
-permissions:
-  contents: write
+permissions: {}
 
 jobs:
   update-sha:
+    permissions:
+      contents: write
     runs-on: ubuntu-24.04-arm
     if: github.actor == 'renovate[bot]' && startsWith(github.head_ref, 'release-v')
     steps:
