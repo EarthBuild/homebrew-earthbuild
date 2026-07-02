@@ -56,7 +56,7 @@ readall:
 # fetch verifies source URLs and sha256 checksums
 fetch:
     FROM +src
-    RUN brew fetch --build-from-source EarthBuild/tap/earth
+    RUN brew fetch EarthBuild/tap/earth
 
 # livecheck checks if there is a newer version available upstream
 livecheck:

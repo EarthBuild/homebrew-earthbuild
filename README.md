@@ -20,9 +20,3 @@ Or you can tap the repository first and then install:
 brew tap earthbuild/tap
 brew install earth
 ```
-
-To install the latest development version directly from the main branch (which may be unstable), run:
-
-```shell
-brew install --HEAD earthbuild/tap/earth
-```

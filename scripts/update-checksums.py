@@ -19,7 +19,7 @@ def main():
     url = f"https://github.com/EarthBuild/earthbuild/releases/download/v{version}/checksum.asc"
     print(f"Fetching checksums from: {url}")
     try:
-        with urllib.request.urlopen(url) as response:
+        with urllib.request.urlopen(url, timeout=60) as response:
             checksums_text = response.read().decode('utf-8')
     except Exception as e:
         print(f"Error fetching checksums: {e}")
@@ -30,7 +30,8 @@ def main():
     for line in checksums_text.splitlines():
         parts = line.split()
         if len(parts) == 2:
-            hashes[parts[1]] = parts[0]
+            filename = parts[1].lstrip('*')
+            hashes[filename] = parts[0]
 
     required_binaries = [
         "earth-darwin-arm64",
