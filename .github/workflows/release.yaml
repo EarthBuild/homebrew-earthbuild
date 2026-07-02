@@ -1,0 +1,36 @@
+name: Release
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions: {}
+
+jobs:
+  update-sha:
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04-arm
+    if: github.actor == 'renovate[bot]' && startsWith(github.head_ref, 'release-v')
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Update checksums
+        run: python3 scripts/update-checksums.py
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --exit-code Formula/earth.rb; then
+            git add Formula/earth.rb
+            git commit -m "chore: update sha256 checksums"
+            git push
+          else
+            echo "No checksum changes detected."
+          fi

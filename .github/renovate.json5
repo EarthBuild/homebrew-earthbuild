@@ -7,4 +7,22 @@
     ":semanticCommits",
   ],
   labels: ["renovate"],
+  customManagers: [
+    {
+      customType: "regex",
+      fileMatch: ["^Formula/earth\\.rb$"],
+      matchStrings: [
+        "version\\s+\"(?<currentValue>.*?)\""
+      ],
+      datasourceTemplate: "github-tags",
+      depNameTemplate: "EarthBuild/earthbuild"
+    }
+  ],
+  packageRules: [
+    {
+      matchPackageNames: ["EarthBuild/earthbuild"],
+      branchName: "release-v{{{newVersion}}}",
+      automerge: true
+    }
+  ],
 }

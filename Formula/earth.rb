@@ -1,44 +1,62 @@
 class Earth < Formula
   desc "Build automation tool for the container era"
-  homepage "https://github.com/earthbuild"
-  url "https://github.com/EarthBuild/earthbuild.git",
-    tag: "v0.8.17",
-      revision: "52f2da6dd7f3de24a60a76e00044ec560b0ea407"
+  homepage "https://github.com/EarthBuild/earthbuild"
+  version "0.8.17"
   license "MPL-2.0"
-  head "https://github.com/EarthBuild/earthbuild.git", branch: "main"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_tahoe: "194e4b767c3d1a551453ceb3739345c84de89533768b352e3b339d116497a238"
+  on_macos do
+    on_arm do
+      url "https://github.com/EarthBuild/earthbuild/releases/download/v#{version}/earth-darwin-arm64"
+      sha256 "2e0a5e7b5623e2bfdab3e0be6bbbcb772f1d2ad6562132fbc3c9ce5564a939c1"
+    end
+    on_intel do
+      url "https://github.com/EarthBuild/earthbuild/releases/download/v#{version}/earth-darwin-amd64"
+      sha256 "4ba8af21431b276edfacf8730e9372da1842ead0bc9bf0f6a014896afca97c96"
+    end
   end
 
-  depends_on "go" => :build
+  on_linux do
+    on_arm do
+      url "https://github.com/EarthBuild/earthbuild/releases/download/v#{version}/earth-linux-arm64"
+      sha256 "bdc776167083e1bc4ec01379e88c6ae6372f52e4ea034e931865ff4ba030df63"
+    end
+    on_intel do
+      url "https://github.com/EarthBuild/earthbuild/releases/download/v#{version}/earth-linux-amd64"
+      sha256 "85b7f31020be220493c1ef89fe4e976985a72e54dd12b7dfcf17544c8d4fd880"
+    end
+  end
 
   def install
-    ENV["CGO_ENABLED"] = "0"
-    ldflags = %W[
-      -s -w
-      -X main.DefaultBuildkitdImage=docker.io/earthly/buildkitd:v0.8.16
-      -X main.Version=v#{version}
-      -X main.GitSha=#{Utils.git_head}
-      -X main.BuiltBy=homebrew-earthbuild
-    ]
-    tags = "dfrunmount dfrunsecurity dfsecrets dfssh dfrunnetwork dfheredoc forceposix"
-    system "go", "build", "-tags", tags, *std_go_args(ldflags: ldflags, output: bin/"earthly"), "./cmd/earthly"
+    binary_name = if OS.mac?
+      Hardware::CPU.arm? ? "earth-darwin-arm64" : "earth-darwin-amd64"
+    else
+      Hardware::CPU.arm? ? "earth-linux-arm64" : "earth-linux-amd64"
+    end
 
-    bin.install_symlink "earthly" => "earth"
+    chmod 0755, binary_name
+    bin.install binary_name => "earth"
+    bin.install_symlink "earth" => "earthly"
 
     generate_completions_from_executable(bin/"earth", "bootstrap", "--source", shells: [:bash, :zsh])
   end
 
+  def caveats
+    <<~EOS
+      EarthBuild requires a container runtime to function.
+      If you don't have one, you can install Docker or Podman:
+        brew install --cask docker
+        OR
+        brew install podman
+    EOS
+  end
+
   test do
-    # earthbuild requires docker to run; therefore doing a complete end-to-end test here is not
-    # possible; however the "earthbuild ls" command is able to run without docker.
-    (testpath/"Earthfile").write <<~EOS
+    (testpath / "Earthfile").write <<~EOS
       VERSION 0.8
       mytesttarget:
       \tRUN echo Homebrew
     EOS
-    output = shell_output("#{bin}/earthly ls")
+    output = shell_output("#{bin}/earth ls")
     assert_match "+mytesttarget", output
   end
 end
