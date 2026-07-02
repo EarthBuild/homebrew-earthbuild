@@ -16,6 +16,8 @@ RUN git config --global --add safe.directory /home/linuxbrew/earthbuild-tap && \
 src:
     COPY --dir .git Formula .
     RUN brew tap EarthBuild/tap . && brew trust EarthBuild/tap
+    SAVE ARTIFACT Formula
+    SAVE ARTIFACT .git
 
 # check verifies the quality of the formula
 check:
@@ -63,79 +65,17 @@ livecheck:
 
 # test runs all tests
 test:
-    BUILD +test-install-bin
-    BUILD +test-install-src
+    BUILD +test-install
     BUILD +test-formula
+
+# test-install installs the pre-compiled binary
+test-install:
+    FROM +src
+    RUN brew install EarthBuild/tap/earth
+    RUN earth --version
 
 # test-formula runs the built-in 'test do' block defined in the formula
 test-formula:
     FROM +src
-    RUN brew install --head --build-from-source --debug EarthBuild/tap/earth
+    RUN brew install EarthBuild/tap/earth
     RUN brew test --verbose --debug EarthBuild/tap/earth
-
-test-install-bin:
-    FROM +src
-    ENV HOMEBREW_DEVELOPER=1
-    COPY +bottle-linux/earth--*.bottle.tar.gz ./bottles/
-    RUN arch="$(uname -m)"; \
-        if [ "$arch" = "aarch64" ]; then \
-            bottle_file=$(ls ./bottles/earth--*.arm64_linux.bottle.tar.gz); \
-        else \
-            bottle_file=$(ls ./bottles/earth--*.x86_64_linux.bottle.tar.gz); \
-        fi; \
-        brew install --verbose "$bottle_file"
-    RUN earth --version
-
-test-install-src:
-    FROM +src
-    RUN brew install --head --build-from-source --debug EarthBuild/tap/earth
-
-# bottle-linux builds a linux bottle for the host arch
-bottle-linux:
-    FROM +src
-    RUN brew install --build-bottle EarthBuild/tap/earth
-    RUN brew bottle --no-rebuild --json EarthBuild/tap/earth
-    SAVE ARTIFACT earth--*.bottle.tar.gz AS LOCAL ./bottles/
-    SAVE ARTIFACT earth--*.bottle.json AS LOCAL ./bottles/
-
-# bottle-linux-all builds linux bottles for both amd64 and arm64
-bottle-linux-all:
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +bottle-linux
-
-# bottle-mac builds a macos bottle natively
-bottle-mac:
-    LOCALLY
-    RUN mkdir -p bottles/
-    RUN brew install --build-bottle EarthBuild/tap/earth
-    RUN brew bottle --no-rebuild --json EarthBuild/tap/earth
-    RUN mv earth--*.bottle.* bottles/
-
-publish:
-    FROM +src
-    ARG GITHUB_REF
-    ARG GITHUB_SHA
-    ARG --required GIT_USER_EMAIL
-    ARG --required GIT_USER_NAME
-
-    # Copy the bottles built by the workflow
-    COPY ./bottles ./bottles
-
-    # Upload bottles to GHCR and update the formula bottle block
-    RUN --secret HOMEBREW_GITHUB_PACKAGES_TOKEN=GITHUB_TOKEN \
-        git config --global user.email "$GIT_USER_EMAIL" && \
-        git config --global user.name "$GIT_USER_NAME" && \
-        cd ./bottles && \
-        brew pr-upload --debug --verbose
-
-    # Merge into main and delete release branch
-    # RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
-    #     set -e && \
-    #     GITHUB_REPOSITORY=$(git remote get-url origin | sed -E 's|.*github.com[:/]([^/]+/[^/.]+)(\.git)?|\1|') && \
-    #     SHA=$(git rev-parse HEAD) && \
-    #     git remote set-url origin https://x-access-token:$GITHUB_TOKEN@github.com/"$GITHUB_REPOSITORY" && \
-    #     git fetch -a && \
-    #     git checkout main && \
-    #     git reset --hard origin/main && \
-    #     git merge "$SHA" && \
-    #     git push origin main && \
-    #     git push origin --delete "$GITHUB_REF"
