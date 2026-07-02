@@ -1,6 +1,6 @@
 class Earth < Formula
   desc "Build automation tool for the container era"
-  homepage "https://earthbuild.dev"
+  homepage "https://github.com/EarthBuild/earthbuild"
   version "0.8.17"
   license "MPL-2.0"
 
