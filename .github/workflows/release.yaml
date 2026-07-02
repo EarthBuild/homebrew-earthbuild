@@ -1,36 +1,35 @@
 name: Release
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
-    types: [opened, synchronize]
     branches:
       - main
 
 permissions:
   contents: write
-  packages: write
 
 jobs:
-  check:
-    runs-on: ubuntu-24.04
-    env:
-      FORCE_COLOR: 1
+  update-sha:
+    runs-on: ubuntu-24.04-arm
+    if: github.actor == 'renovate[bot]' && startsWith(github.head_ref, 'release-v')
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: earthbuild/actions-setup@cec13796de0f8178bfeed4ef3ea2e9d90d96fc7f # main
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.event.pull_request.head.ref }}
 
-      - name: Bootstrap buildkitd
-        run: earth bootstrap
+      - name: Update checksums
+        run: python3 scripts/update-checksums.py
 
-      - name: Lint
-        run: earth --ci +lint
-
-      - name: Test
-        run: earth --ci +test
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --exit-code Formula/earth.rb; then
+            git add Formula/earth.rb
+            git commit -m "chore: update sha256 checksums"
+            git push
+          else
+            echo "No checksum changes detected."
+          fi

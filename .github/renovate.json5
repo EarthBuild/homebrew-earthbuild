@@ -21,7 +21,8 @@
   packageRules: [
     {
       matchPackageNames: ["EarthBuild/earthbuild"],
-      branchName: "release-v{{{newVersion}}}"
+      branchName: "release-v{{{newVersion}}}",
+      automerge: true
     }
   ],
 }
