@@ -11,12 +11,16 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.2.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: earthbuild/actions-setup@f4d20223e70dbb43b5fc08c4d857ab9cf0dbf3ae # v2.2.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Dynamically fetch & update release checksums for version bump PRs (e.g. from Renovate) before testing
+      - name: Update checksums
+        run: python3 scripts/update-checksums.py
 
       - name: Bootstrap buildkitd
         run: earth bootstrap
