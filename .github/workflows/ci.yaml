@@ -18,6 +18,10 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      # Dynamically fetch & update release checksums for version bump PRs (e.g. from Renovate) before testing
+      - name: Update checksums
+        run: python3 scripts/update-checksums.py
+
       - name: Bootstrap buildkitd
         run: earth bootstrap
 
